@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تطبيق إدارة المهام</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .app {
+            background: #fff;
+            padding: 20px;
+            width: 350px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 75%;
+            padding: 8px;
+        }
+
+        button {
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            background: #eee;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        li.done {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <h2>📝 إدارة المهام</h2>
+    <input type="text" id="taskInput" placeholder="أدخل مهمة جديدة">
+    <button onclick="addTask()">إضافة</button>
+
+    <ul id="taskList"></ul>
+</div>
+
+<script>
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+
+    function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks.forEach(task => createTask(task.text, task.done));
+    }
+
+    function saveTasks() {
+        const tasks = [];
+        document.querySelectorAll("li").forEach(li => {
+            tasks.push({
+                text: li.querySelector("span").innerText,
+                done: li.classList.contains("done")
+            });
+        });
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function createTask(text, done = false) {
+        const li = document.createElement("li");
+        if (done) li.classList.add("done");
+
+        const span = document.createElement("span");
+        span.innerText = text;
+        span.onclick = () => {
+            li.classList.toggle("done");
+            saveTasks();
+        };
+
+        const delBtn = document.createElement("button");
+        delBtn.innerText = "❌";
+        delBtn.onclick = () => {
+            li.remove();
+            saveTasks();
+        };
+
+        li.appendChild(span);
+        li.appendChild(delBtn);
+        taskList.appendChild(li);
+    }
+
+    function addTask() {
+        if (taskInput.value.trim() === "") return;
+        createTask(taskInput.value);
+        taskInput.value = "";
+        saveTasks();
+    }
+
+    loadTasks();
+</script>
+
+</body>
+</html>
